@@ -2,45 +2,77 @@
 
 ## Abstract
 
-This report details a comprehensive study conducted to compare the performance of three prominent deep learning models, Facenet, DeepFace, and VGG Face, in the task of face verification. Using the Labeled Faces in the Wild (LFW) dataset, each model's performance was evaluated, and a majority voting ensemble method was employed to consolidate the models' predictions. Contrary to expectations, the ensemble approach did not show a significant improvement over the individual models' performance. This report presents the process, findings, challenges faced, and offers avenues for future work in this area.
+This report documents a comprehensive study comparing the performance of three prevalent deep learning models, Facenet, DeepFace, and VGG Face, in the task of face verification. Using the Labeled Faces in the Wild (LFW) dataset, the performance of each model was evaluated, and a majority voting ensemble method was used to consolidate the models' predictions. The ensemble approach did not demonstrate a significant improvement over individual model performance, contrary to initial expectations. This report discusses the process, findings, challenges, and future work.
 
 ## Introduction
 
-Face verification, a vital aspect of biometrics and security systems, aims to verify a person's identity by comparing a presented face with the one on file. This task has been significantly enhanced by deep learning models that can extract intricate features for accurate identification, even under varying conditions. Despite this, achieving high accuracy remains a persistent challenge due to factors such as lighting, facial expressions, and poses. This study aims to evaluate and compare the accuracy of three popular deep learning models – Facenet, DeepFace, and VGG Face – for the face verification task.
+Face verification is a critical aspect of biometrics and security systems, verifying a person's identity by comparing a presented face with the one on file. Deep learning models, capable of extracting intricate features for accurate identification, significantly enhanced this task. Nevertheless, achieving high accuracy remains a challenge due to factors such as lighting, facial expressions, and poses. This study's objective was to evaluate and compare the accuracy of three popular deep learning models – Facenet, DeepFace, and VGG Face – for the face verification task.
 
 ## Background
 
-Face verification involves a one-to-one match that verifies the authenticity of a specific user's claimed identity. This task is different from face recognition, which is a one-to-many problem that involves identifying a person from a group of known people.
+Face verification involves a one-to-one match that verifies the authenticity of a specific user's claimed identity. This task is distinct from face recognition, which is a one-to-many problem identifying a person from a group of known individuals.
 
-In recent years, deep learning-based models have emerged as the state-of-the-art in face verification tasks. This study focuses on three such models:
+Deep learning-based models have emerged as state-of-the-art in face verification tasks in recent years. This study focuses on three such models:
 
-1. **Facenet**: This model, proposed by researchers at Google, uses a deep convolutional network trained to directly optimize the embedding itself, rather than intermediate representations.
+1. **Facenet**: Proposed by Google researchers, Facenet uses a deep convolutional network trained to directly optimize the embedding itself, rather than intermediate representations.
+   
+2. **DeepFace**: Developed by Facebook AI, DeepFace leverages a nine-layer deep neural network with over 120 million parameters to learn representations directly from raw pixels.
+   
+3. **VGG Face**: Developed by the Visual Geometry Group (VGG) at Oxford, VGG Face applies the principles of VGG's work on deep convolutional networks for image recognition to the problem of face verification.
 
-2. **DeepFace**: This model, developed by Facebook AI, leverages a nine-layer deep neural network with over 120 million parameters to learn representations directly from raw pixels.
-
-3. **VGG Face**: Developed by the Visual Geometry Group (VGG) at Oxford, this model applies the principles of VGG's work on deep convolutional networks for image recognition to the problem of face verification.
-
-These models were selected based on their widespread use in the field and their performance in benchmark tests.
+These models were selected due to their widespread use in the field and their performance in benchmark tests.
 
 ## Implementation
 
-The study used the LFW dataset, which comprises over 13,000 face photographs designed for studying the problem of unconstrained face recognition. We utilized these image pairs to feed into our models, each returning a binary output indicating whether the images were of the same individual (true) or not (false).
+The study used the LFW dataset, which consists of over 13,000 face photographs designed for studying the problem of unconstrained face recognition. These image pairs were inputted into our models, each of which returned a binary output indicating whether the images were of the same individual (true) or not (false).
 
-To improve the comparability of the results, the same image pre-processing steps were applied across all models. However, the attempt to improve detection accuracy using an autocropping function yielded no substantial improvements, as each model had embedded autocropping functions.
+To improve the comparability of results, the same image pre-processing steps were applied across all models. However, the attempt to enhance detection accuracy using an autocropping function did not yield significant improvements, as each model had embedded autocropping functions.
 
-Following this, each model’s output was consolidated into a Pandas DataFrame, and a majority voting system was applied to compute the final verdict. The consolidated results were then exported as a CSV file for further analysis. 
+For the implementation, a series of Python scripts were created. The first script was used to predict labels for each model and save these predictions in individual pandas DataFrames. Each DataFrame consisted of two columns: the image pair ID and the corresponding prediction.
+
+```python
+def generate_predictions(model_name, dataset_name):
+    dataset_path = f"./{dataset_name}"
+    predictions = []
+
+    for id in range(400):  
+        img1_path = f"{dataset_path}/{dataset_name}_{id:03}_0.jpg"
+        img2_path = f"{dataset_path}/{dataset_name}_{id:03}_1.jpg"
+
+        if os.path.exists(img1_path) and os.path.exists(img2_path):
+            result = DeepFace.verify(img1_path, img2_path, model_name=model_name, enforce_detection=False)
+            prediction = result['verified']
+            predictions.append(int(prediction))
+        else:
+            print(f"Images {img1_path} or {img2_path} does not exist.")
+
+    return predictions
+```
+
+The second script combined these predictions into a single DataFrame and calculated the majority
+
+ vote for each image pair. This DataFrame was then saved as a CSV file for further analysis.
+
+```python
+# Combine the model labels into a single DataFrame
+df = pd.concat([Facenet_labels_df, DeepFace_labels_df, VGG_labels_df], axis=1)
+
+# Calculate the majority vote for the final label
+df['majority_vote'] = df.mode(axis=1)[0]
+
+# Save the DataFrame to a CSV file in the current directory
+current_directory = os.getcwd()
+output_file_path = os.path.join(current_directory, 'model_predictions.csv')
+df.to_csv(output_file_path, index=False)
+```
 
 ## Results
 
-The results revealed that all models performed well on the face verification task, but none of them achieved perfect accuracy. This demonstrates the persistent challenges in face verification tasks, particularly when dealing with unconstrained images, as is the case with the LFW dataset.
-
-An interesting finding was that the ensemble method, despite its theoretical potential to improve accuracy, did not provide an accuracy boost in this case. This suggests that the models may have been making similar errors, negating the advantage of combining their predictions.
+The results showed that each model had its strengths and weaknesses, with none of them achieving perfect accuracy. The ensemble method did not perform better than the individual models, indicating that combining models using a majority vote may not be the optimal solution for face verification tasks.
 
 ## Challenges
 
-One major challenge encountered was the inconsistent performance of the autocropping function. While theoretically beneficial, the autocropping function failed to improve detection accuracy. This suggests the complexity of the problem and the difficulty of identifying a one-size-fits-all preprocessing step that works effectively across different
-
- models.
+One of the main challenges was the variability in the LFW dataset. As the images were not taken under controlled conditions, factors such as different lighting conditions, facial expressions, and poses made it difficult to achieve a high verification accuracy across all models.
 
 Another challenge was the computational cost associated with running these models. While necessary for an accurate comparison, the process was time-consuming and required substantial computational resources.
 
