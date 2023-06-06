@@ -1,74 +1,61 @@
-# Lab Report
+# Face Verification Using Deep Learning: A Comparative Study
 
-Title: Face Recognition using Different Models
+## Abstract
 
-## Introduction:
+This report details a comprehensive study conducted to compare the performance of three prominent deep learning models, Facenet, DeepFace, and VGG Face, in the task of face verification. Using the Labeled Faces in the Wild (LFW) dataset, each model's performance was evaluated, and a majority voting ensemble method was employed to consolidate the models' predictions. Contrary to expectations, the ensemble approach did not show a significant improvement over the individual models' performance. This report presents the process, findings, challenges faced, and offers avenues for future work in this area.
 
-The objective of this lab is to evaluate the performance of different deep learning models, namely Facenet, Deepface, and VGG-Face, in performing facial recognition tasks. The models were evaluated on the Labeled Faces in the Wild (LFW) dataset, a validation dataset, and a test dataset. Performance was assessed based on accuracy, precision, recall, and the F1 score.
+## Introduction
 
-## Methods:
+Face verification, a vital aspect of biometrics and security systems, aims to verify a person's identity by comparing a presented face with the one on file. This task has been significantly enhanced by deep learning models that can extract intricate features for accurate identification, even under varying conditions. Despite this, achieving high accuracy remains a persistent challenge due to factors such as lighting, facial expressions, and poses. This study aims to evaluate and compare the accuracy of three popular deep learning models – Facenet, DeepFace, and VGG Face – for the face verification task.
 
-The experiment started with preparing the datasets. For this, three different datasets were used, namely the LFW dataset, a validation dataset, and a testing dataset. The LFW dataset was prepared and saved to Google Drive. Similarly, the validation and testing datasets were also prepared and randomly visualized.
+## Background
 
-Following the preparation of datasets, different models were tested on a random image pair. These models include DeepFace, Facenet, and VGG-Face. The verification was done using cosine distance.
+Face verification involves a one-to-one match that verifies the authenticity of a specific user's claimed identity. This task is different from face recognition, which is a one-to-many problem that involves identifying a person from a group of known people.
 
-After testing the models, a function was defined to evaluate the model on a given dataset. This function takes as input the model name and the dataset name. It calculates various metrics including accuracy, precision, recall, and F1 score. These metrics were calculated for each model on the validation dataset.
+In recent years, deep learning-based models have emerged as the state-of-the-art in face verification tasks. This study focuses on three such models:
 
-Lastly, the predictions were generated for each model on the testing dataset, and a majority vote was taken to finalize the prediction. These predictions were then saved to a CSV file.
+1. **Facenet**: This model, proposed by researchers at Google, uses a deep convolutional network trained to directly optimize the embedding itself, rather than intermediate representations.
 
-## Results:
+2. **DeepFace**: This model, developed by Facebook AI, leverages a nine-layer deep neural network with over 120 million parameters to learn representations directly from raw pixels.
 
-The Facenet, DeepFace, and VGG-Face models were compared based on the calculated metrics. These metrics included accuracy, precision, recall, and the F1 score. The results were plotted for a clearer comparison between the models.
+3. **VGG Face**: Developed by the Visual Geometry Group (VGG) at Oxford, this model applies the principles of VGG's work on deep convolutional networks for image recognition to the problem of face verification.
 
+These models were selected based on their widespread use in the field and their performance in benchmark tests.
 
+## Implementation
 
-## Discussion:
+The study used the LFW dataset, which comprises over 13,000 face photographs designed for studying the problem of unconstrained face recognition. We utilized these image pairs to feed into our models, each returning a binary output indicating whether the images were of the same individual (true) or not (false).
 
-The lab provided an insightful comparison between different deep learning models used for face recognition. It also demonstrated the process of preparing datasets, testing models, and evaluating their performance. The metrics calculated served as a valuable measure to understand the strengths and weaknesses of each model.
+To improve the comparability of the results, the same image pre-processing steps were applied across all models. However, the attempt to improve detection accuracy using an autocropping function yielded no substantial improvements, as each model had embedded autocropping functions.
 
-Accuracy is a crucial measure to identify the overall effectiveness of a model. However, in scenarios where the datasets are not symmetric and the false positives and negatives are of significant concern, other measures such as precision, recall, and F1 score provide a more comprehensive evaluation. 
+Following this, each model’s output was consolidated into a Pandas DataFrame, and a majority voting system was applied to compute the final verdict. The consolidated results were then exported as a CSV file for further analysis. 
 
-Sure, here is how the section could be added to the report:
+## Results
 
----
+The results revealed that all models performed well on the face verification task, but none of them achieved perfect accuracy. This demonstrates the persistent challenges in face verification tasks, particularly when dealing with unconstrained images, as is the case with the LFW dataset.
 
-**Challenges with Auto-cropping in Image Preprocessing**
+An interesting finding was that the ensemble method, despite its theoretical potential to improve accuracy, did not provide an accuracy boost in this case. This suggests that the models may have been making similar errors, negating the advantage of combining their predictions.
 
-In our endeavor to enhance the image detection performance of our application, we experimented with the integration of an auto-cropping mechanism in the image preprocessing pipeline. Auto-cropping, an image processing technique, is utilized to trim unnecessary outer portions from a picture. The hypothesis driving this experiment was that by focusing only on the significant parts of an image and negating the background noise, we could facilitate our object detection model to recognize the target objects more effectively.
+## Challenges
 
-Regrettably, the application of auto-cropping did not lead to the desired enhancement in our object detection performance. We propose the following potential explanations for this outcome:
+One major challenge encountered was the inconsistent performance of the autocropping function. While theoretically beneficial, the autocropping function failed to improve detection accuracy. This suggests the complexity of the problem and the difficulty of identifying a one-size-fits-all preprocessing step that works effectively across different
 
-1. **Unreliable Cropping Mechanism:** The auto-cropping algorithm we implemented may have been imprecise in determining the boundaries of the object of interest. If these boundaries are inaccurately identified, the resultant cropped image might omit vital portions of the object, creating a more challenging scenario for our object detection model.
+ models.
 
-2. **Varied Object Locations:** Our image dataset consists of objects that are not necessarily located centrally or uniformly. If the auto-cropping algorithm cannot accurately detect and focus on these objects, it might result in cropped images where the object is partially or even entirely excluded.
+Another challenge was the computational cost associated with running these models. While necessary for an accurate comparison, the process was time-consuming and required substantial computational resources.
 
-3. **Loss of Contextual Information:** The auto-cropping process could be inadvertently removing vital contextual information. Object detection models can frequently utilize background elements and environmental hints to more effectively identify objects. By eradicating these elements, our model might be handicapped.
+## Conclusion
 
-4. **Size and Aspect Ratio Distortion:** Auto-cropping can lead to distortions in the size and aspect ratio of objects in an image. This is particularly true for objects of varying shapes and sizes, which can confuse the object detection model, especially if it has been trained on images maintaining a standard aspect ratio.
+This study offers a comprehensive comparison of three widely-used deep learning models in face verification tasks. Although each model performed well, none could achieve perfect accuracy, demonstrating the inherent challenges in face verification tasks. The majority voting ensemble method, though theoretically sound, did not offer improvements, indicating the necessity for further exploration of model combinations and ensemble methods.
 
-Our future endeavors will be focused on improving the precision of our auto-cropping algorithm and exploring alternative image preprocessing methods that maintain a balance between focusing on the object and preserving contextual information. Additionally, we will be working on enhancing the robustness of our object detection model to account for variations in object location, size, and aspect ratio.
+The results provide insights into the strengths and weaknesses of each model and serve as a stepping-stone for future investigations in the face verification field.
 
----
+## References
 
+1. Serengil, S. I., & Ozpinar, A. (2020). LightFace: A Hybrid Deep Face Recognition Framework. In 2020 Innovations in Intelligent Systems and Applications Conference (ASYU) (pp. 23-27). IEEE.
 
-## Conclusion:
+2. Serengil, S. I., & Ozpinar, A. (2021). HyperExtended LightFace: A Facial Attribute Analysis Framework. In 2021 International Conference on Engineering and Emerging Technologies (ICEET) (pp. 1-4). IEEE.
 
-In conclusion, this lab offered a practical approach to face recognition using deep learning models. The process involved data preparation, model testing, performance evaluation, and output generation. The comparative analysis of different models provides a valuable insight into the model selection based on their performance. 
+3. Serengil, S. I., & Ozpinar, A. (2023). An Evaluation of SQL and NoSQL Databases for Facial Recognition Pipelines. Cambridge Open Engage.
 
-Further work could involve optimizing these models and experimenting with additional models to enhance the face recognition task's performance. The use of different datasets could also provide further validation of the models' effectiveness. 
-
-In addition, the majority voting system used for finalizing the predictions could be analyzed further. Other decision-making approaches could be tested to observe their impact on the overall performance of the face recognition task.
-
-## References:
-
-- Labeled Faces in the Wild (LFW) dataset
-- Facenet, Deepface, and VGG-Face models
-- sklearn.metrics for calculating performance metrics
-- DeepFace library for face recognition
-- TensorFlow Datasets
-- Python libraries: Numpy, Pandas, matplotlib, os, and PIL
-
-## Appendices:
-
-The complete Python code used in this lab is included in the appendix. The code includes the necessary comments to understand its functionality.
-
+4. Labeled Faces in the Wild (LFW): [link](https://sefiks.com/2020/08/27/labeled-faces-in-the-wild-for-face-recognition/)
