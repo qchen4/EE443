@@ -67,8 +67,34 @@ df.to_csv(output_file_path, index=False)
 ```
 
 ## Results
+The FaceNet, DeepFace, and VGG-Face models were compared based on the calculated metrics. 
 
-The results showed that each model had its strengths and weaknesses, with none of them achieving perfect accuracy. The ensemble method did not perform better than the individual models, indicating that combining models using a majority vote may not be the optimal solution for face verification tasks.
+
+### Model Performance
+
+| Model           | LFW Dataset Accuracy | Validation Dataset Accuracy |
+|-----------------|----------------------|-----------------------------|
+| FaceNet         | 0.801                | 0.89                        |
+| DeepFace        | 0.602                | 0.69                        |
+| VGG-Face        | 0.84                 | 0.84                        |
+| Combined Models | 0.81                 | 0.90                        |
+
+In this table, we present the accuracy scores achieved by different face recognition models on two datasets: LFW dataset and a validation dataset. The models evaluated are FaceNet, DeepFace, VGG-Face, and a combination of multiple models. The accuracy scores are provided for both datasets separately.
+
+
+When evaluating the performance of our model, we utilize several key evaluation metrics. Accuracy serves as an intuitive measure, representing the ratio of correctly predicted observations to the total number of observations. While high accuracy is desirable, it is most effective when dealing with symmetric datasets where false positives and false negatives have similar values.
+
+Precision, on the other hand, focuses on the precision of our predictions. It quantifies the model's ability to correctly identify positive observations, even if it captures only a few. High precision indicates that the model minimizes false positives, showcasing its capability to avoid labeling negative samples as positive.
+
+Recall, also known as sensitivity, represents the ratio of correctly predicted positive observations to all observations within the actual positive class. A high recall indicates that the model effectively captures a large number of positive instances, but it may also generate more false positives.
+
+To strike a balance between precision and recall, we employ the F1 Score. This metric calculates the weighted average or harmonic mean of precision and recall. By considering both false positives and false negatives, the F1 Score provides a comprehensive assessment of the model's performance. However, it may not be the optimal metric when dealing with imbalanced class distributions, as it assigns equal weight to false positives and false negatives. In such cases, the F1 Score is more applicable and informative in multi-class scenarios.
+
+Comparing the results, we find that the DeepFace model is under-performing and the reason can be attributed to our failure to tune the threshold. Without this crucial step, our model's ability to accurately recognize and classify faces is compromised. By neglecting to optimize the threshold parameter, we hinder the model's discriminative capacity, leading to reduced accuracy and reliability in face verification tasks. The threshold serves as a decision boundary, determining the similarity threshold required to accept or reject face matches. Without proper tuning, we fail to strike a balance between false acceptance and false rejection rates, resulting in compromised performance. 
+
+In future work, to address this issue, we need to undertake a comprehensive threshold-tuning process. This involves evaluating various threshold values and assessing performance metrics such as precision, recall, F1 score, and accuracy. Through iterative adjustments, we can identify an optimal threshold value that maximizes the model's discriminative power and enhances its ability to accurately recognize and classify faces. By incorporating this crucial threshold tuning step, we can improve the DeepFace model's performance and strengthen the overall efficacy of our face verification system.
+
+ 
 
 ## Challenges
 
